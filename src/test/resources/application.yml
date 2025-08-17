@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    hot:
+      url: jdbc:h2:mem:hotdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+    cold:
+      url: jdbc:h2:mem:colddb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+    archive:
+      url: jdbc:h2:mem:hkdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+
+  jpa:
+    hot:
+      properties:
+        hibernate:
+          ddl-auto: create-drop
+      show-sql: true
+    cold:
+      properties:
+        hibernate:
+          ddl-auto: create-drop
+      show-sql: true
+    archive:
+      properties:
+        hibernate:
+          ddl-auto: create-drop
+      show-sql: true
+
+  h2:
+    console:
+      enabled: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: archive-hk-service
+      auto-offset-reset: earliest
+    listener:
+      missing-topics-fatal: false
+    topics:
+      archivePolicyUpdate: archive-policy-update
+      archiveManualTrigger: archive-manual-trigger
+      archiveReplies: archive-replies
+      archive:
+        commands:
+          checkpoint: archive-commands-checkpoint
+          policy: archive-commands-policy

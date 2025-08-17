@@ -1,0 +1,74 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: Archive
+  config:
+    import: optional:file:/etc/db_credentials.yml,
+      optional:file:C:/config/dbcredentials.yml
+  datasource:
+    hot:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/hotdb
+      username: ${db.hot.username}
+      password: ${db.hot.password}
+      hikari:
+        maximum-pool-size: 3
+        minimum-idle: 1
+        pool-name: hot-pool
+        auto-commit: false
+    cold:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/colddb
+      username: ${db.cold.username}
+      password: ${db.cold.password}
+      hikari:
+        maximum-pool-size: 3
+        minimum-idle: 1
+        pool-name: cold-pool
+        auto-commit: false
+    archive:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/hkdb
+      username: ${db.hk.username}
+      password: ${db.hk.password}
+      hikari:
+        maximum-pool-size: 3
+        minimum-idle: 1
+        pool-name: hk-pool
+        auto-commit: false
+  jpa:
+    hot:
+      properties:
+        hibernate:
+          ddl-auto: update
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+      show-sql: true
+    cold:
+      properties:
+        hibernate:
+          ddl-auto: update
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+      show-sql: true
+    archive:
+      properties:
+        hibernate:
+          ddl-auto: update
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+      show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: archive-hk-service
+      auto-offset-reset: earliest
+    listener:
+      missing-topics-fatal: false
+    topics:
+      archivePolicyUpdate: archive-policy-update
+      archiveManualTrigger: archive-manual-trigger
+      archiveReplies: archive-replies
+      archive:
+        commands:
+          checkpoint: archive-commands-checkpoint
+          policy: archive-commands-policy
