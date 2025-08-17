@@ -6,8 +6,8 @@ services:
     container_name: postgres-hot
     environment:
       POSTGRES_DB: hotdb
-      POSTGRES_USER: hotuser
-      POSTGRES_PASSWORD: hotpass
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
     ports:
       - "5433:5432"
     networks:
@@ -18,8 +18,8 @@ services:
     container_name: postgres-cold
     environment:
       POSTGRES_DB: colddb
-      POSTGRES_USER: colduser
-      POSTGRES_PASSWORD: coldpass
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
     ports:
       - "5434:5432"
     networks:
@@ -30,8 +30,8 @@ services:
     container_name: postgres-archive
     environment:
       POSTGRES_DB: hkdb
-      POSTGRES_USER: hkuser
-      POSTGRES_PASSWORD: hkpass
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
     ports:
       - "5435:5432"
     networks:

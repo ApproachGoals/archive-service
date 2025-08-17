@@ -16,5 +16,5 @@ COPY --from=builder /app/target/archive-service-0.0.1-SNAPSHOT.jar archive-servi
 
 EXPOSE 8081
 
-# run service
+# ========== run service ==========
 ENTRYPOINT ["java","-jar","archive-service.jar"]
