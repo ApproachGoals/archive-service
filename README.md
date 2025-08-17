@@ -14,6 +14,7 @@ This microservice works alongside other services in a Kafka-based event-driven a
 
 - **Hot database:** Temporary storage for recent data
 - **Cold database:** Long-term storage
+- **Archive database:** the storage for the archive policy
 - **Kafka:** Used for communication between services
 - **Scheduler:** Triggers the data migration process at regular intervals
 
