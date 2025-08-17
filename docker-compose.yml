@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  postgres-hot:
+    image: postgres:15
+    container_name: postgres-hot
+    environment:
+      POSTGRES_DB: hotdb
+      POSTGRES_USER: hotuser
+      POSTGRES_PASSWORD: hotpass
+    ports:
+      - "5433:5432"
+    networks:
+      - archive-net
+
+  postgres-cold:
+    image: postgres:15
+    container_name: postgres-cold
+    environment:
+      POSTGRES_DB: colddb
+      POSTGRES_USER: colduser
+      POSTGRES_PASSWORD: coldpass
+    ports:
+      - "5434:5432"
+    networks:
+      - archive-net
+
+  postgres-archive:
+    image: postgres:15
+    container_name: postgres-archive
+    environment:
+      POSTGRES_DB: hkdb
+      POSTGRES_USER: hkuser
+      POSTGRES_PASSWORD: hkpass
+    ports:
+      - "5435:5432"
+    networks:
+      - archive-net
+
+  archive-service:
+    build: .
+    container_name: archive-service
+    depends_on:
+      - postgres-hot
+      - postgres-cold
+      - postgres-archive
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./db_credentials.yml:/etc/db_credentials.yml:ro
+    environment:
+      SPRING_DATASOURCE_HOT_URL: jdbc:postgresql://postgres-hot:5432/hotdb
+      SPRING_DATASOURCE_COLD_URL: jdbc:postgresql://postgres-cold:5432/colddb
+      SPRING_DATASOURCE_ARCHIVE_URL: jdbc:postgresql://postgres-archive:5432/hkdb
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+    networks:
+      - archive-net
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    ports:
+      - "9092:9092"
+    networks:
+      - archive-net
+
+networks:
+  archive-net:
+    driver: bridge
